@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 import os
 from PIL import Image
+import io
 
 # Try to support HEIC images
 try:
@@ -140,23 +141,62 @@ elif page == "Table view":
         df.to_csv("DHMLISTING.csv", sep=";", index=False, encoding="latin1")
         st.success("Changes saved successfully!")
 
+    # --- Download button for selection ---
+    download_cols = ["Label", "Size", "Date"]
+    if not filtered_df.empty:
+        to_download = filtered_df[download_cols]
+
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+            to_download.to_excel(writer, index=False, sheet_name="Selection")
+        buffer.seek(0)
+
+        st.download_button(
+            label="📥 Download the selection",
+            data=buffer,
+            file_name="DHM_selection.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+
     # --- Drag and drop image upload ---
     st.markdown("---")
     st.subheader("Upload DHM Image")
 
-    uploaded_file = st.file_uploader("Drag and drop an image here", type=["jpg", "png", "jpeg", "HEIC"])
+    uploaded_file = st.file_uploader(
+        "Drag and drop an image here",
+        type=["jpg", "png", "jpeg", "HEIC"],
+        key="image_uploader"
+    )
 
-    # Select the DHM row the image belongs to
-    dhm_for_image = st.selectbox("Select DHM to associate with this image", options=df["Label"].unique())
+    # Only show DHMs without an existing picture
+    dhm_no_picture = df_present[df_present["Photo status"] == "No pictures"]["Label"].unique()
 
+    if len(dhm_no_picture) > 0:
+        dhm_for_image = st.selectbox(
+            "Select DHM to associate with this image",
+            options=dhm_no_picture,
+            key="dhm_selectbox"
+        )
+    else:
+        dhm_for_image = None
+        st.info("✅ All DHMs already have pictures. Nothing to upload.")
+
+    # Upload button
     if uploaded_file is not None and dhm_for_image:
-        # Determine original filename
-        photo_name = df.loc[df["Label"] == dhm_for_image, "Photo"].values[0]
-        # Get the file extension
-        file_ext = os.path.splitext(uploaded_file.name)[1]
-        # Build save path
-        save_path = os.path.join("DHMparis", f"{photo_name}{file_ext}")
-        # Save the uploaded image
-        with open(save_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        st.success(f"Image saved for DHM {dhm_for_image} at {save_path}")
+        if st.button("Upload image"):
+            # Determine original filename from CSV
+            photo_name = df.loc[df["Label"] == dhm_for_image, "Photo"].values[0]
+            # Get the file extension from uploaded file
+            file_ext = os.path.splitext(uploaded_file.name)[1].lower()
+            # Build save path
+            save_path = os.path.join("DHMparis", f"{photo_name}{file_ext}")
+            # Save the uploaded image
+            with open(save_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+
+            # ✅ Update extension in CSV if not HEIC
+            if file_ext != ".heic":
+                df.loc[df["Label"] == dhm_for_image, "Extension"] = file_ext
+                df.to_csv("DHMLISTING.csv", sep=";", index=False, encoding="latin1")
+
+            st.success(f"📷 Image saved for DHM {dhm_for_image} at {save_path}")
