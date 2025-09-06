@@ -23,5 +23,3 @@ selection = df[df["Label"].isin(dhm_filter)] if dhm_filter else df
 
 if len(dhm_filter) > 0:
     st.dataframe(selection)
-
-    print("hey")
