@@ -88,17 +88,22 @@ if page == "Gallery view":
         st.info("Please select at least one DHM to display results.")
 
 elif page == "Table view":
+    # --- Table view ---
     st.subheader("Full DHM Table with Filters")
 
-    # Create a copy of df for display
+    # Keep original Photo column intact
     df_present = df.drop(columns=["Extension"]).copy()
 
-    # Add 'Photo' status column automatically checking the correct extension
+    # Add a temporary column for display
     def check_photo(row):
-        img_path = f"DHMparis/{row['Photo']}{row['Extension']}"
-        return "Existing" if os.path.exists(img_path) else "No pictures"
+        possible_extensions = [".jpg", ".png", ".HEIC", ".jpeg"]
+        for ext in possible_extensions:
+            img_path = f"DHMparis/{row['Photo']}{ext}"
+            if os.path.exists(img_path):
+                return "Existing"
+        return "No pictures"
 
-    df_present["Photo"] = df.apply(check_photo, axis=1)
+    df_present["Photo status"] = df_present.apply(check_photo, axis=1)
 
     filtered_df = df_present.copy()
 
@@ -111,10 +116,28 @@ elif page == "Table view":
         else:
             min_val = df_present[col].min()
             max_val = df_present[col].max()
-            selected_range = st.sidebar.slider(f"Filter {col}", min_value=min_val, max_value=max_val, value=(min_val, max_val), key=col+"_slider")
+            selected_range = st.sidebar.slider(f"Filter {col}", min_value=min_val, max_value=max_val,
+                                            value=(min_val, max_val), key=col+"_slider")
             filtered_df = filtered_df[(filtered_df[col] >= selected_range[0]) & (filtered_df[col] <= selected_range[1])]
 
-    st.dataframe(filtered_df.reset_index(drop=True))
-    st.markdown(f"**Total items:** {len(filtered_df)}")
+    # --- Editable table ---
+    editable_cols = ["Size", "Date", "Location", "Color"]  # only these columns editable
+    col_config = {col: {"editable": col in editable_cols} for col in filtered_df.columns}
 
+    edited_df = st.data_editor(
+        filtered_df,
+        num_rows="fixed",
+        use_container_width=True,
+        column_config=col_config,
+        key="editable_table"
+    )
 
+    st.markdown(f"**Total items:** {len(edited_df)}")
+
+    # --- Save button ---
+    if st.button("Save changes to CSV"):
+        # Only update editable columns in original df
+        df.update(edited_df[editable_cols])
+        # Save changes back to CSV
+        df.to_csv("DHMLISTING.csv", sep=";", index=False, encoding="latin1")
+        st.success("Changes saved successfully!")
