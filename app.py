@@ -16,6 +16,11 @@ except ImportError:
 df = pd.read_csv("DHMLISTING.csv", encoding="latin1", sep=";")
 
 st.set_page_config(page_title="DHM LISTING", layout="wide")
+
+# --- Initialize session_state for gallery filter ---
+if "gallery_filter" not in st.session_state:
+    st.session_state["gallery_filter"] = []
+
 st.title("DHM LISTING")
 
 # --- PAGE SELECTION ---
@@ -36,10 +41,18 @@ if page == "Gallery view":
         dhm_options = df["Label"].unique()
 
     # Sidebar filter by 'Label' (mandatory)
-    dhm_filter = st.sidebar.multiselect(
-        "Select DHM",
-        options=dhm_options
-    )
+    if st.session_state["gallery_filter"]:
+        dhm_filter = st.sidebar.multiselect(
+            "Select DHM",
+            options=dhm_options,
+            default=st.session_state["gallery_filter"]
+        )
+    else:
+        dhm_filter = st.sidebar.multiselect(
+            "Select DHM",
+            options=dhm_options,
+            default=[]
+        )
 
     if dhm_filter:
         selection = df[df["Label"].isin(dhm_filter)]
@@ -157,6 +170,13 @@ elif page == "Table view":
             file_name="DHM_selection.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
+
+    # --- Apply filters in Gallery button ---
+    if st.button("Apply the filters in the Gallery"):
+        # Save the filtered DHMs in session_state
+        st.session_state["gallery_filter"] = filtered_df["Label"].tolist()
+        # Switch to Gallery view
+        st.experimental_rerun()
 
     # --- Drag and drop image upload ---
     st.markdown("---")
