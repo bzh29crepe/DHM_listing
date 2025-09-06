@@ -4,8 +4,6 @@ import os
 from PIL import Image
 import io
 from fpdf import FPDF
-import requests
-from io import BytesIO
 
 # Try to support HEIC images
 try:
@@ -14,9 +12,6 @@ try:
     heic_supported = True
 except ImportError:
     heic_supported = False
-
-# GitHub raw base URL for images
-GITHUB_RAW_BASE = "https://raw.githubusercontent.com/bzh29crepe/DHM_listing/main/DHMparis"
 
 # Load CSV
 df = pd.read_csv("DHMLISTING.csv", encoding="latin1", sep=";")
@@ -32,23 +27,6 @@ st.title("DHM LISTING")
 # --- PAGE SELECTION ---
 page = st.sidebar.radio("Select Page", ["Gallery view", "Table view"])
 
-def load_image(row):
-    """Load image from local or GitHub raw URL."""
-    local_path = os.path.join("DHMparis", f"{row['Photo']}{row['Extension']}")
-    if os.path.exists(local_path):
-        return Image.open(local_path).convert("RGB")
-    else:
-        # Fallback to GitHub raw URL
-        url = f"{GITHUB_RAW_BASE}/{row['Photo']}{row['Extension']}"
-        try:
-            resp = requests.get(url)
-            resp.raise_for_status()
-            return Image.open(BytesIO(resp.content)).convert("RGB")
-        except Exception as e:
-            st.warning(f"Could not load image {row['Label']} from GitHub: {e}")
-            return None
-
-# --- GALLERY VIEW ---
 if page == "Gallery view":
     st.subheader("Gallery View")
 
@@ -58,11 +36,14 @@ if page == "Gallery view":
         selected_df = df[df["Label"].isin(st.session_state["gallery_filter"])]
 
         for _, row in selected_df.iterrows():
-            img = load_image(row)
-            if img is not None:
+            img_path = os.path.abspath(f"DHMparis/{row['Photo']}{row['Extension']}")
+            if os.path.exists(img_path):
                 try:
+                    # Open and convert image
+                    img = Image.open(img_path).convert("RGB")
+
                     # Save temporary PNG
-                    tmp_path = f"temp_{row['Label']}.png"
+                    tmp_path = os.path.abspath(f"temp_{row['Label']}.png")
                     img.save(tmp_path, format="PNG")
 
                     # Add new page
@@ -74,7 +55,7 @@ if page == "Gallery view":
                     img_width_px, img_height_px = img.size
                     img_ratio = img_width_px / img_height_px
 
-                    # Scale to fit width and max height while keeping proportions
+                    # Scale to fit width and max height
                     pdf_width_mm = min(max_page_width_mm, img_width_px * 0.264583)
                     pdf_height_mm = pdf_width_mm / img_ratio
                     if pdf_height_mm > max_img_height_mm:
@@ -95,7 +76,7 @@ if page == "Gallery view":
                     pdf.multi_cell(0, 6, size_text, align="L")
 
                 except Exception as e:
-                    st.warning(f"Could not add image {row['Label']} to PDF: {e}")
+                    st.warning(f"Could not add image {row['Label']}: {e}")
                     continue
 
         # Output PDF to BytesIO
@@ -110,18 +91,31 @@ if page == "Gallery view":
         )
 
     st.sidebar.header("Filter Options")
+    # Sidebar filter by 'Location' (optional)
     location_filter = st.sidebar.multiselect(
         "Refine by Location",
         options=df["Location"].dropna().unique()
     )
 
-    # DHM selection
-    dhm_options = df[df["Location"].isin(location_filter)]["Label"].unique() if location_filter else df["Label"].unique()
-    dhm_filter = st.sidebar.multiselect(
-        "Select DHM",
-        options=dhm_options,
-        default=st.session_state["gallery_filter"] if st.session_state["gallery_filter"] else []
-    )
+    # Filter DHM options based on selected locations
+    if location_filter:
+        dhm_options = df[df["Location"].isin(location_filter)]["Label"].unique()
+    else:
+        dhm_options = df["Label"].unique()
+
+    # Sidebar filter by 'Label' (mandatory)
+    if st.session_state["gallery_filter"]:
+        dhm_filter = st.sidebar.multiselect(
+            "Select DHM",
+            options=dhm_options,
+            default=st.session_state["gallery_filter"]
+        )
+    else:
+        dhm_filter = st.sidebar.multiselect(
+            "Select DHM",
+            options=dhm_options,
+            default=[]
+        )
 
     if dhm_filter:
         selection = df[df["Label"].isin(dhm_filter)]
@@ -130,24 +124,30 @@ if page == "Gallery view":
 
         if not selection.empty:
             st.subheader("Selected Variation")
+
             if not heic_supported:
-                st.warning(".HEIC images may not display because 'pillow-heif' is not installed. Install with `pip install pillow-heif`")
+                st.warning(" .HEIC images may not display because 'pillow-heif' is not installed. "
+                           "Install it with: `pip install pillow-heif`")
 
             for _, row in selection.iterrows():
-                image = load_image(row)
+                img_path = f"DHMparis/{row['Photo']}{row['Extension']}"
                 col1, col2 = st.columns([2, 1])
-                if image is not None:
-                    with col1:
-                        st.image(image, use_column_width=True)
-                    with col2:
-                        st.markdown(f"""
-                        ## DHM {row['Label']}
-                        ### {row['Size'] if pd.notna(row['Size']) else 'Unknown size'} cm
-                        {row['Date'] if pd.notna(row['Date']) else 'Unknown date'} 
+                if os.path.exists(img_path):
+                    try:
+                        image = Image.open(img_path)
+                        with col1:
+                            st.image(image, use_column_width=True)
+                        with col2:
+                            st.markdown(f"""
+                            ## DHM {row['Label']}
+                            ### {row['Size'] if pd.notna(row['Size']) else 'Unknown size'} cm
+                            {row['Date'] if pd.notna(row['Date']) else 'Unknown date'} 
 
-                        **Location:** {row['Location'] if pd.notna(row['Location']) else 'Unknown location'}
-                        """)
-                    st.markdown("---")
+                            **Location:** {row['Location'] if pd.notna(row['Location']) else 'Unknown location'}
+                            """)
+                        st.markdown("---")
+                    except Exception as e:
+                        st.error(f"Could not load image for DHM {row['Label']}: {e}")
                 else:
                     with col1:
                         st.title(f"No image found for DHM {row['Label']}")
@@ -165,34 +165,26 @@ if page == "Gallery view":
     else:
         st.info("Please select at least one DHM to display results.")
 
-# --- TABLE VIEW ---
 elif page == "Table view":
     st.subheader("Full DHM Table with Filters")
 
+    # Keep original Photo column intact
     df_present = df.drop(columns=["Extension"]).copy()
 
-    # Check photo existence (local or GitHub)
+    # Add a temporary column for display
     def check_photo(row):
         possible_extensions = [".jpg", ".png", ".HEIC", ".jpeg"]
         for ext in possible_extensions:
-            local_path = f"DHMparis/{row['Photo']}{ext}"
-            if os.path.exists(local_path):
+            img_path = f"DHMparis/{row['Photo']}{ext}"
+            if os.path.exists(img_path):
                 return "Existing"
-            # Try GitHub URL
-            url = f"{GITHUB_RAW_BASE}/{row['Photo']}{ext}"
-            try:
-                resp = requests.head(url)
-                if resp.status_code == 200:
-                    return "Existing"
-            except:
-                continue
         return "No pictures"
 
     df_present["Photo status"] = df_present.apply(check_photo, axis=1)
 
     filtered_df = df_present.copy()
 
-    # Filters
+    # Filters for each column
     for col in df_present.columns:
         if df_present[col].dtype == "object":
             selected_vals = st.sidebar.multiselect(f"Filter {col}", options=df_present[col].dropna().unique(), key=col)
@@ -205,27 +197,36 @@ elif page == "Table view":
                                                value=(min_val, max_val), key=col+"_slider")
             filtered_df = filtered_df[(filtered_df[col] >= selected_range[0]) & (filtered_df[col] <= selected_range[1])]
 
-    # Editable table
-    editable_cols = ["Size", "Date", "Location", "Color"]
+    # --- Editable table ---
+    editable_cols = ["Size", "Date", "Location", "Color"]  # only these columns editable
     col_config = {col: {"editable": col in editable_cols} for col in filtered_df.columns}
 
-    edited_df = st.data_editor(filtered_df, num_rows="fixed", use_container_width=True, column_config=col_config, key="editable_table")
+    edited_df = st.data_editor(
+        filtered_df,
+        num_rows="fixed",
+        use_container_width=True,
+        column_config=col_config,
+        key="editable_table"
+    )
 
     st.markdown(f"**Total items:** {len(edited_df)}")
 
+    # --- CSV Save button ---
     if st.button("Save changes to CSV"):
         df.update(edited_df[editable_cols])
         df.to_csv("DHMLISTING.csv", sep=";", index=False, encoding="latin1")
         st.success("Changes saved successfully!")
 
-    # Download filtered selection
+    # --- Download button for selection ---
     download_cols = ["Label", "Size", "Date"]
     if not filtered_df.empty:
         to_download = filtered_df[download_cols]
+
         buffer = io.BytesIO()
         with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
             to_download.to_excel(writer, index=False, sheet_name="Selection")
         buffer.seek(0)
+
         st.download_button(
             label="Download the selection",
             data=buffer,
@@ -233,11 +234,14 @@ elif page == "Table view":
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
 
+    # --- Apply filters in Gallery button ---
     if st.button("Apply the filters in the Gallery"):
+        # Save the filtered DHMs in session_state
         st.session_state["gallery_filter"] = filtered_df["Label"].tolist()
+        # Switch to Gallery view
         st.experimental_rerun()
 
-    # Upload DHM image
+    # --- Drag and drop image upload ---
     st.markdown("---")
     st.subheader("Upload DHM Image")
 
@@ -247,6 +251,7 @@ elif page == "Table view":
         key="image_uploader"
     )
 
+    # Only show DHMs without an existing picture
     dhm_no_picture = df_present[df_present["Photo status"] == "No pictures"]["Label"].unique()
 
     if len(dhm_no_picture) > 0:
@@ -259,14 +264,22 @@ elif page == "Table view":
         dhm_for_image = None
         st.info("✅ All DHMs already have pictures. Nothing to upload.")
 
+    # Upload button
     if uploaded_file is not None and dhm_for_image:
         if st.button("Upload image"):
+            # Determine original filename from CSV
             photo_name = df.loc[df["Label"] == dhm_for_image, "Photo"].values[0]
+            # Get the file extension from uploaded file
             file_ext = os.path.splitext(uploaded_file.name)[1].lower()
+            # Build save path
             save_path = os.path.join("DHMparis", f"{photo_name}{file_ext}")
+            # Save the uploaded image
             with open(save_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
+
+            # Update extension in CSV if not HEIC
             if file_ext != ".heic":
                 df.loc[df["Label"] == dhm_for_image, "Extension"] = file_ext
                 df.to_csv("DHMLISTING.csv", sep=";", index=False, encoding="latin1")
+
             st.success(f"📷 Image saved for DHM {dhm_for_image} at {save_path}")
