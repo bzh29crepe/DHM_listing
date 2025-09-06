@@ -82,13 +82,13 @@ if page == "Gallery view":
 
                         **Location:** {row['Location'] if pd.notna(row['Location']) else 'Unknown location'}
                         """)
+                        st.markdown("---")
         else:
             st.info("No items match the selected DHM and location filters.")
     else:
         st.info("Please select at least one DHM to display results.")
 
 elif page == "Table view":
-    # --- Table view ---
     st.subheader("Full DHM Table with Filters")
 
     # Keep original Photo column intact
@@ -107,7 +107,7 @@ elif page == "Table view":
 
     filtered_df = df_present.copy()
 
-    # Create a filter for each column
+    # Filters for each column
     for col in df_present.columns:
         if df_present[col].dtype == "object":
             selected_vals = st.sidebar.multiselect(f"Filter {col}", options=df_present[col].dropna().unique(), key=col)
@@ -117,7 +117,7 @@ elif page == "Table view":
             min_val = df_present[col].min()
             max_val = df_present[col].max()
             selected_range = st.sidebar.slider(f"Filter {col}", min_value=min_val, max_value=max_val,
-                                            value=(min_val, max_val), key=col+"_slider")
+                                               value=(min_val, max_val), key=col+"_slider")
             filtered_df = filtered_df[(filtered_df[col] >= selected_range[0]) & (filtered_df[col] <= selected_range[1])]
 
     # --- Editable table ---
@@ -134,10 +134,29 @@ elif page == "Table view":
 
     st.markdown(f"**Total items:** {len(edited_df)}")
 
-    # --- Save button ---
+    # --- CSV Save button ---
     if st.button("Save changes to CSV"):
-        # Only update editable columns in original df
         df.update(edited_df[editable_cols])
-        # Save changes back to CSV
         df.to_csv("DHMLISTING.csv", sep=";", index=False, encoding="latin1")
         st.success("Changes saved successfully!")
+
+    # --- Drag and drop image upload ---
+    st.markdown("---")
+    st.subheader("Upload DHM Image")
+
+    uploaded_file = st.file_uploader("Drag and drop an image here", type=["jpg", "png", "jpeg", "HEIC"])
+
+    # Select the DHM row the image belongs to
+    dhm_for_image = st.selectbox("Select DHM to associate with this image", options=df["Label"].unique())
+
+    if uploaded_file is not None and dhm_for_image:
+        # Determine original filename
+        photo_name = df.loc[df["Label"] == dhm_for_image, "Photo"].values[0]
+        # Get the file extension
+        file_ext = os.path.splitext(uploaded_file.name)[1]
+        # Build save path
+        save_path = os.path.join("DHMparis", f"{photo_name}{file_ext}")
+        # Save the uploaded image
+        with open(save_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        st.success(f"Image saved for DHM {dhm_for_image} at {save_path}")
