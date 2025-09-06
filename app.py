@@ -89,8 +89,19 @@ if page == "Gallery view":
 
 elif page == "Table view":
     st.subheader("Full DHM Table with Filters")
-    df_present = df.drop(columns=["Photo", "Extension"])
+
+    # Create a copy of df for display
+    df_present = df.drop(columns=["Extension"]).copy()
+
+    # Add 'Photo' status column automatically checking the correct extension
+    def check_photo(row):
+        img_path = f"DHMparis/{row['Photo']}{row['Extension']}"
+        return "Existing" if os.path.exists(img_path) else "No pictures"
+
+    df_present["Photo"] = df.apply(check_photo, axis=1)
+
     filtered_df = df_present.copy()
+
     # Create a filter for each column
     for col in df_present.columns:
         if df_present[col].dtype == "object":
@@ -105,3 +116,5 @@ elif page == "Table view":
 
     st.dataframe(filtered_df.reset_index(drop=True))
     st.markdown(f"**Total items:** {len(filtered_df)}")
+
+

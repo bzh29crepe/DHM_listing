@@ -30,10 +30,10 @@ Label;Size;Date;Color;Location;Photo;Extension
 29;54 x 65;1975;Mauve;P;DHM29;.HEIC
 30;46 x 55;;Gris mauve;P;DHM30;.HEIC
 31;38 x 46 ;1975/80;Vert;BH Vendu;DHM31;.HEIC
-32;38 x 46;1975;Gris;BH à noter sur le consignment;DHM32;.HEIC
+32;38 x 46;1975;Gris;BH ? noter sur le consignment;DHM32;.HEIC
 33;46 x 55;;Vert;BH Vendu;DHM33;.HEIC
 34;70 x 70 ;1975/80;Gris;P;DHM34;.HEIC
-35;;1975;;Marianne Hyafil, Paris (décédée à Paris en 2022);DHM35;.HEIC
+35;;1975;;Marianne Hyafil, Paris (d?c?d?e ? Paris en 2022);DHM35;.HEIC
 36;;1975/78;;FNAC;DHM36;.HEIC
 37;60 x 73;1975/76;Gris;B;DHM37;.HEIC
 38;;;;;DHM38;.HEIC
@@ -108,7 +108,7 @@ Label;Size;Date;Color;Location;Photo;Extension
 106;;;;;DHM106;.HEIC
 107;30 x 30;;Bordeau;B;DHM107;.HEIC
 108;;;;;DHM108;.HEIC
-109;46,5 x 61,5;1975/77;Rose foncé;B;DHM109;.HEIC
+109;46,5 x 61,5;1975/77;Rose fonc?;B;DHM109;.HEIC
 110;46,5 x 61,5;1975/78;Jaune;B;DHM110;.HEIC
 111;;;;;DHM111;.HEIC
 112;33 x 55;;Vert;B;DHM112;.HEIC
@@ -116,7 +116,7 @@ Label;Size;Date;Color;Location;Photo;Extension
 114;;;;;DHM114;.HEIC
 115;;;;;DHM115;.HEIC
 116;;;;;DHM116;.HEIC
-117;26 x 26;1977/78;Gris foncé;B;DHM117;.HEIC
+117;26 x 26;1977/78;Gris fonc?;B;DHM117;.HEIC
 118;;;;;DHM118;.HEIC
 119;;;;;DHM119;.HEIC
 120;;;;;DHM120;.HEIC
@@ -164,7 +164,7 @@ Label;Size;Date;Color;Location;Photo;Extension
 161;73 x 54;1979/83;;BC;DHM161;.HEIC
 162;;;;;DHM162;.HEIC
 163;61 x 50;1979/80;;BC;DHM163;.HEIC
-164;35 x 27;1974/83;Gris;PrÍt Cahiers d Art;DHM164;.HEIC
+164;35 x 27;1974/83;Gris;Pr?t Cahiers d Art;DHM164;.HEIC
 165;;;;;DHM165;.HEIC
 166;80 x 80;1979/2007;;BC;DHM166;.HEIC
 167;;;;;DHM167;.HEIC
@@ -213,7 +213,7 @@ Label;Size;Date;Color;Location;Photo;Extension
 210;;;;;DHM210;.HEIC
 211;50 x 50;1982/85;;BC;DHM211;.HEIC
 212;81 x 65;1982/84;;BC;DHM212;.HEIC
-213;64 x 91;1982/85;Rose poudré;P;DHM213;.HEIC
+213;64 x 91;1982/85;Rose poudr?;P;DHM213;.HEIC
 214;54 x 73;1982/86;Gris;BH Vendu;DHM214;.HEIC
 215;73 x 100;1983/85;Vert d'eau;P;DHM215;.HEIC
 216;71,5 x 60,5;1983/88;;BC;DHM216;.HEIC
@@ -231,24 +231,24 @@ Label;Size;Date;Color;Location;Photo;Extension
 228;63 x 63;1983;;San Joaquin Gal Hospital;DHM228;.HEIC
 229;92 x 65;1983/86;;P;DHM229;.HEIC
 230;43 x 58,5;1983/84;;BC;DHM230;.HEIC
-231;67 x 77;1983/84;Rose poudré;MFA Boston;DHM231;.HEIC
+231;67 x 77;1983/84;Rose poudr?;MFA Boston;DHM231;.HEIC
 232;76 x 58;1983/85;;BC;DHM232;.HEIC
 233;55 x 83;1983/85;Mauve;P ;DHM233;.HEIC
 234;76,5 x 63;1983/85;;BC;DHM234;.HEIC
-235;58 x 48;1983/87;Vert pâle;MFA Boston;DHM235;.HEIC
+235;58 x 48;1983/87;Vert p?le;MFA Boston;DHM235;.HEIC
 236;58 x 38;1983/84;Vert d'eau;MFA Boston;DHM236;.HEIC
 237;84 x 63;1983/85;;Hunter;DHM237;.HEIC
 238;60 x 60;;;Joyce Sborgi, Firenze, Italie (moved to L.A. ? 310-556-1932);DHM238;.HEIC
 239;63 x 63;1984/93;;San Joaquin Gal Hospital;DHM239;.pdf
 240;68 x 86;1984/85;Kaki;B;DHM240;.HEIC
-241;73 x 60;1984/86;Rose poudré;BH Vendu;DHM241;.HEIC
+241;73 x 60;1984/86;Rose poudr?;BH Vendu;DHM241;.HEIC
 242;78,5 x 78,5;1984/85;;San Joaquin Gal Hospital;DHM242;.HEIC
 243;;1984/85;;Lillie & Ned Johnson, Boston;DHM243;.HEIC
 244;86,5 x 63,5;1984/85;;BC;DHM244;.HEIC
 245;58 x 76;1984/85;Vert d'eau;B;DHM245;.HEIC
 246;86,5 x 68,5;1984/86;;BC;DHM246;.HEIC
 247;76 x 66;1984/86;Gris;B;DHM247;.HEIC
-248;44 x 21;1984/86;;Caroline Ferté, Paris;DHM248;.HEIC
+248;44 x 21;1984/86;;Caroline Fert?, Paris;DHM248;.HEIC
 249;65 x 100;1984/86;Jaune;BH Vendu;DHM249;.HEIC
 250;;1984/87;;RMH (Hunter);DHM250;.HEIC
 251;54 x 81;1984/87;Vert d'eau;P;DHM251;.HEIC
@@ -265,18 +265,18 @@ Label;Size;Date;Color;Location;Photo;Extension
 262;80 x 60;1984/86;;Nicholas Argyres, St Louis;DHM262;.HEIC
 263;;;;;DHM263;.HEIC
 264;73 x 92;1985/93;Gris;B;DHM264;.HEIC
-265;60 x 81;1985/95;Vert pâle;B;DHM265;.HEIC
+265;60 x 81;1985/95;Vert p?le;B;DHM265;.HEIC
 266;;;;;DHM266;.HEIC
 267;46 x 55;1985/86;;BC;DHM267;.HEIC
 268;;;;;DHM268;.HEIC
 269;80 x 80;1985/86;;BC;DHM269;.HEIC
 270;50 x 73;1985/2008;;BC;DHM270;.HEIC
-271;60 x 60;1985/88;Rose poudré;B;DHM271;.HEIC
+271;60 x 60;1985/88;Rose poudr?;B;DHM271;.HEIC
 272;63 x 92;1985/93;Vert;B;DHM272;.HEIC
-273;60 x 81 ;1985/2001;Vert pâle;B;DHM273;.HEIC
-274;73 x 60;1985/86;Gris pâle;P;DHM274;.HEIC
+273;60 x 81 ;1985/2001;Vert p?le;B;DHM273;.HEIC
+274;73 x 60;1985/86;Gris p?le;P;DHM274;.HEIC
 275;65 x 92;1985/89;Rose;B;DHM275;.HEIC
-276;81 x 65;1985/88;Rose poudré;P;DHM276;.HEIC
+276;81 x 65;1985/88;Rose poudr?;P;DHM276;.HEIC
 277;;;;;DHM277;.HEIC
 278;;;;;DHM278;.HEIC
 279;;;;;DHM279;.HEIC
@@ -308,7 +308,7 @@ Label;Size;Date;Color;Location;Photo;Extension
 305;;;;;DHM305;.HEIC
 306;;;;;DHM306;.HEIC
 307;92 x 73;1989/90;Mauve;B;DHM307;.jpg
-308;60 x 81 ;1989/92;Gris pâle;P;DHM308;.HEIC
+308;60 x 81 ;1989/92;Gris p?le;P;DHM308;.HEIC
 309;55 x 38;1989/94;;BC;DHM309;.HEIC
 310;81 x 60;1989/2007;Vert d'eau;P;DHM310;.HEIC
 311;;;;;DHM311;.HEIC
@@ -339,8 +339,8 @@ Label;Size;Date;Color;Location;Photo;Extension
 336;81 x 65;1991/93;Gris;B;DHM336;.HEIC
 337;35,5 x 35,5;2005/06;Beige;Irus Hansma;DHM337;.HEIC
 338;25 x 50;1992/94;;BC;DHM338;.HEIC
-339;22 x 33;1991/92;Rose poudré;B;DHM339;.HEIC
-340;73 x 50;1991/2005;Rose poudré;B;DHM340;.HEIC
+339;22 x 33;1991/92;Rose poudr?;B;DHM339;.HEIC
+340;73 x 50;1991/2005;Rose poudr?;B;DHM340;.HEIC
 341;;;;;DHM341;.HEIC
 342;65 x 81;1992/95;Kaki;P;DHM342;.HEIC
 343;60 x 60;1992/96;Gris bleu;Nadezda *;DHM343;.HEIC
@@ -355,7 +355,7 @@ Label;Size;Date;Color;Location;Photo;Extension
 352;;;;;DHM352;.HEIC
 353;;;;;DHM353;.HEIC
 354;81 x 100;1993/97;Jaune;B;DHM354;.HEIC
-355;80 x 80;1993/95;;Ernestos Argyres, Athènes;DHM355;.HEIC
+355;80 x 80;1993/95;;Ernestos Argyres, Ath?nes;DHM355;.HEIC
 356;81 x 100;1993/99;Vert clair;B;DHM356;.HEIC
 357;80 x 80;1993/95;;BC;DHM357;.HEIC
 358;73 x 92;1993/2011;;BC;DHM358;.HEIC
@@ -376,10 +376,10 @@ Label;Size;Date;Color;Location;Photo;Extension
 373;100 x 81;1994/2007;Jaune;B;DHM373;.HEIC
 374;73 x 92;1995/96;;BC;DHM374;.HEIC
 375;81 x 100;1981/82;;Vineyard Conservation Society;DHM375;.HEIC
-376;100 x 73;1995/97;;Ernestos Argyres, Athènes;DHM376;.HEIC
+376;100 x 73;1995/97;;Ernestos Argyres, Ath?nes;DHM376;.HEIC
 377;73 x 92;1995/96;;BC;DHM377;.HEIC
 378;92 x 73;;Gris clair;;DHM378;.HEIC
-379;90 x 118;1995/96;Orange;MFA Boston BC à verifier au Musée;DHM379;.HEIC
+379;90 x 118;1995/96;Orange;MFA Boston BC ? verifier au Mus?e;DHM379;.HEIC
 380;65 x 81;1995/97;;BC;DHM380;.HEIC
 381;73 x 60;1995/96;Mauve;B;DHM381;.HEIC
 382;100 x 73;1995/96;;BC;DHM382;.HEIC
@@ -499,7 +499,7 @@ Label;Size;Date;Color;Location;Photo;Extension
 496;81 x 65;2002/07;;BC;DHM496;.HEIC
 497;60 x 60;2002/10;Bleu vert;B;DHM497;.HEIC
 498;81 x 60;2002/04;;BC;DHM498;.HEIC
-499;81 x 54;2002/04;Vert pâle;B;DHM499;.HEIC
+499;81 x 54;2002/04;Vert p?le;B;DHM499;.HEIC
 500;65 x 54;2002/13;Vert d'eau;P;DHM500;.HEIC
 501;60 x 92;2002/13;;BC;DHM501;.HEIC
 502;81 x 60;2003/05;;BC;DHM502;.HEIC
@@ -537,7 +537,7 @@ Label;Size;Date;Color;Location;Photo;Extension
 534;81 x 65;2005/07;;BC;DHM534;.HEIC
 535;73 x 60 ;2005/07;Bleu;BH Vendu;DHM535;.HEIC
 536;;;;;DHM536;.HEIC
-537;60 x 73;2005/06;Bleu foncé;B;DHM537;.HEIC
+537;60 x 73;2005/06;Bleu fonc?;B;DHM537;.HEIC
 538;81 x 60;2005/12;;BC;DHM538;.HEIC
 539;81 x 60;2005/08;;BC;DHM539;.HEIC
 540;73 x 60 ;2005/08;Vert;B;DHM540;.HEIC
@@ -548,7 +548,7 @@ Label;Size;Date;Color;Location;Photo;Extension
 545;;;;;DHM545;.HEIC
 546;;;;;DHM546;.HEIC
 547;;;;;DHM547;.HEIC
-548;65 x 54;2006/08;Gris foncé;Nadezda;DHM548;.HEIC
+548;65 x 54;2006/08;Gris fonc?;Nadezda;DHM548;.HEIC
 549;92 x 73;2006/08;;BC;DHM549;.HEIC
 550;60 x 81;2008/09;Bleu;B;DHM550;.HEIC
 551;;2006;;Lucy & Peter Sprayregen, Marion, MA;DHM551;.HEIC
