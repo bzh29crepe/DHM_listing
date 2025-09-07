@@ -4,6 +4,8 @@ import os
 from PIL import Image
 import io
 from fpdf import FPDF
+import requests
+from io import BytesIO
 
 # Try to support HEIC images
 try:
@@ -13,8 +15,12 @@ try:
 except ImportError:
     heic_supported = False
 
-# Load CSV
-df = pd.read_csv("DHMLISTING.csv", encoding="latin1", sep=";")
+# --- GitHub raw base paths ---
+CSV_URL = "https://raw.githubusercontent.com/bzh29crepe/DHM_listing/main/DHMLISTING.csv"
+IMG_BASE = "https://raw.githubusercontent.com/bzh29crepe/DHM_listing/main/DHMparis"
+
+# Load CSV directly from GitHub
+df = pd.read_csv(CSV_URL, encoding="latin1", sep=";")
 
 st.set_page_config(page_title="DHM LISTING", layout="wide")
 
@@ -23,6 +29,17 @@ if "gallery_filter" not in st.session_state:
     st.session_state["gallery_filter"] = []
 
 st.title("DHM LISTING")
+
+# --- Helper to load image from GitHub ---
+def load_image(row):
+    url = f"{IMG_BASE}/{row['Photo']}{row['Extension']}"
+    try:
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        return Image.open(BytesIO(resp.content)).convert("RGB")
+    except Exception as e:
+        st.warning(f"Could not load image {row['Label']} from GitHub: {e}")
+        return None
 
 # --- PAGE SELECTION ---
 page = st.sidebar.radio("Select Page", ["Gallery view", "Table view"])
@@ -36,14 +53,11 @@ if page == "Gallery view":
         selected_df = df[df["Label"].isin(st.session_state["gallery_filter"])]
 
         for _, row in selected_df.iterrows():
-            img_path = os.path.abspath(f"DHMparis/{row['Photo']}{row['Extension']}")
-            if os.path.exists(img_path):
+            img = load_image(row)
+            if img is not None:
                 try:
-                    # Open and convert image
-                    img = Image.open(img_path).convert("RGB")
-
                     # Save temporary PNG
-                    tmp_path = os.path.abspath(f"temp_{row['Label']}.png")
+                    tmp_path = f"temp_{row['Label']}.png"
                     img.save(tmp_path, format="PNG")
 
                     # Add new page
@@ -130,24 +144,20 @@ if page == "Gallery view":
                            "Install it with: `pip install pillow-heif`")
 
             for _, row in selection.iterrows():
-                img_path = f"DHMparis/{row['Photo']}{row['Extension']}"
+                image = load_image(row)
                 col1, col2 = st.columns([2, 1])
-                if os.path.exists(img_path):
-                    try:
-                        image = Image.open(img_path)
-                        with col1:
-                            st.image(image, use_column_width=True)
-                        with col2:
-                            st.markdown(f"""
-                            ## DHM {row['Label']}
-                            ### {row['Size'] if pd.notna(row['Size']) else 'Unknown size'} cm
-                            {row['Date'] if pd.notna(row['Date']) else 'Unknown date'} 
+                if image is not None:
+                    with col1:
+                        st.image(image, use_column_width=True)
+                    with col2:
+                        st.markdown(f"""
+                        ## DHM {row['Label']}
+                        ### {row['Size'] if pd.notna(row['Size']) else 'Unknown size'} cm
+                        {row['Date'] if pd.notna(row['Date']) else 'Unknown date'} 
 
-                            **Location:** {row['Location'] if pd.notna(row['Location']) else 'Unknown location'}
-                            """)
-                        st.markdown("---")
-                    except Exception as e:
-                        st.error(f"Could not load image for DHM {row['Label']}: {e}")
+                        **Location:** {row['Location'] if pd.notna(row['Location']) else 'Unknown location'}
+                        """)
+                    st.markdown("---")
                 else:
                     with col1:
                         st.title(f"No image found for DHM {row['Label']}")
@@ -171,14 +181,14 @@ elif page == "Table view":
     # Keep original Photo column intact
     df_present = df.drop(columns=["Extension"]).copy()
 
-    # Add a temporary column for display
+    # Add a temporary column for display (via GitHub)
     def check_photo(row):
-        possible_extensions = [".jpg", ".png", ".HEIC", ".jpeg"]
-        for ext in possible_extensions:
-            img_path = f"DHMparis/{row['Photo']}{ext}"
-            if os.path.exists(img_path):
-                return "Existing"
-        return "No pictures"
+        url = f"{IMG_BASE}/{row['Photo']}.jpg"
+        try:
+            resp = requests.head(url, timeout=5)
+            return "Existing" if resp.status_code == 200 else "No pictures"
+        except:
+            return "No pictures"
 
     df_present["Photo status"] = df_present.apply(check_photo, axis=1)
 
