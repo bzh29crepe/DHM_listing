@@ -22,6 +22,8 @@ IMG_BASE = "https://raw.githubusercontent.com/bzh29crepe/DHM_listing/main/DHMpar
 # Load CSV directly from GitHub
 df = pd.read_csv(CSV_URL, encoding="latin1", sep=";")
 
+df.columns = df.columns.str.strip()
+
 st.set_page_config(page_title="DHM LISTING", layout="wide")
 
 # --- Initialize session_state for gallery filter ---
