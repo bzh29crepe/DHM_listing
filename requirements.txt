@@ -1,0 +1,8 @@
+streamlit
+pandas
+Pillow
+fpdf
+requests
+pillow-heif
+xlsxwriter
+openpyxl

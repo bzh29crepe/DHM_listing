@@ -178,34 +178,35 @@ if page == "Gallery view":
 elif page == "Table view":
     st.subheader("Full DHM Table with Filters")
 
-    # Keep original Photo column intact
+    # Keep original Photo column intact (no automatic check)
     df_present = df.drop(columns=["Extension"]).copy()
-
-    # Add a temporary column for display (via GitHub)
-    def check_photo(row):
-        url = f"{IMG_BASE}/{row['Photo']}.jpg"
-        try:
-            resp = requests.head(url, timeout=5)
-            return "Existing" if resp.status_code == 200 else "No pictures"
-        except:
-            return "No pictures"
-
-    df_present["Photo status"] = df_present.apply(check_photo, axis=1)
 
     filtered_df = df_present.copy()
 
     # Filters for each column
     for col in df_present.columns:
         if df_present[col].dtype == "object":
-            selected_vals = st.sidebar.multiselect(f"Filter {col}", options=df_present[col].dropna().unique(), key=col)
+            selected_vals = st.sidebar.multiselect(
+                f"Filter {col}", 
+                options=df_present[col].dropna().unique(), 
+                key=col
+            )
             if selected_vals:
                 filtered_df = filtered_df[filtered_df[col].isin(selected_vals)]
         else:
             min_val = df_present[col].min()
             max_val = df_present[col].max()
-            selected_range = st.sidebar.slider(f"Filter {col}", min_value=min_val, max_value=max_val,
-                                               value=(min_val, max_val), key=col+"_slider")
-            filtered_df = filtered_df[(filtered_df[col] >= selected_range[0]) & (filtered_df[col] <= selected_range[1])]
+            selected_range = st.sidebar.slider(
+                f"Filter {col}", 
+                min_value=min_val, 
+                max_value=max_val,
+                value=(min_val, max_val), 
+                key=col+"_slider"
+            )
+            filtered_df = filtered_df[
+                (filtered_df[col] >= selected_range[0]) & 
+                (filtered_df[col] <= selected_range[1])
+            ]
 
     # --- Editable table ---
     editable_cols = ["Size", "Date", "Location", "Color"]  # only these columns editable
@@ -251,6 +252,39 @@ elif page == "Table view":
         # Switch to Gallery view
         st.experimental_rerun()
 
+    # --- Manual "Check Photo" with dropdown ---
+    st.markdown("---")
+    st.subheader("Check DHM Photos")
+
+    if not filtered_df.empty:
+        dhm_to_check = st.selectbox(
+            "Select a DHM to check",
+            options=filtered_df["Label"].unique(),
+            key="dhm_check_select"
+        )
+
+        if st.button("Check photo"):
+            photo_name = df.loc[df["Label"] == dhm_to_check, "Photo"].values[0]
+            ext = df.loc[df["Label"] == dhm_to_check, "Extension"].values[0]
+
+            if pd.isna(ext):
+                ext = ".jpg"  # fallback
+
+            url = f"{IMG_BASE}/{photo_name}{ext}"
+
+            try:
+                resp = requests.head(url, timeout=5)
+                if resp.status_code == 200:
+                    st.success(f"✅ Image exists at {url}")
+                    st.image(url, caption=f"DHM {dhm_to_check}", use_column_width=True)
+                else:
+                    st.error(f"❌ No picture found at {url}")
+            except Exception as e:
+                st.error(f"Error checking image: {e}")
+    else:
+        st.info("No DHMs to check in the current filter.")
+
+
     # --- Drag and drop image upload ---
     st.markdown("---")
     st.subheader("Upload DHM Image")
@@ -261,19 +295,16 @@ elif page == "Table view":
         key="image_uploader"
     )
 
-    # Only show DHMs without an existing picture
-    dhm_no_picture = df_present[df_present["Photo status"] == "No pictures"]["Label"].unique()
+    # Only show DHMs without an Extension value
+    dhm_no_picture = df[df["Extension"].isna()]["Label"].unique()
 
-    if len(dhm_no_picture) > 0:
-        dhm_for_image = st.selectbox(
+
+    dhm_for_image = st.selectbox(
             "Select DHM to associate with this image",
             options=dhm_no_picture,
             key="dhm_selectbox"
         )
-    else:
-        dhm_for_image = None
-        st.info("✅ All DHMs already have pictures. Nothing to upload.")
-
+    
     # Upload button
     if uploaded_file is not None and dhm_for_image:
         if st.button("Upload image"):
