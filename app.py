@@ -38,7 +38,7 @@ def load_image(row):
         resp.raise_for_status()
         return Image.open(BytesIO(resp.content)).convert("RGB")
     except Exception as e:
-        st.warning(f"Could not load image {row['Label']} from GitHub: {e}")
+        st.warning(f"Could not load image {row['Variation']} from GitHub: {e}")
         return None
 
 # --- PAGE SELECTION ---
@@ -50,14 +50,14 @@ if page == "Gallery view":
     if st.button("Download PDF"):
         pdf = FPDF()
         pdf.set_auto_page_break(auto=True, margin=15)
-        selected_df = df[df["Label"].isin(st.session_state["gallery_filter"])]
+        selected_df = df[df["Variation"].isin(st.session_state["gallery_filter"])]
 
         for _, row in selected_df.iterrows():
             img = load_image(row)
             if img is not None:
                 try:
                     # Save temporary PNG
-                    tmp_path = f"temp_{row['Label']}.png"
+                    tmp_path = f"temp_{row['Variation']}.png"
                     img.save(tmp_path, format="PNG")
 
                     # Add new page
@@ -84,13 +84,13 @@ if page == "Gallery view":
                     # Add text below the image
                     pdf.set_xy(x_pos, y_pos + pdf_height_mm + 5)  # 5 mm below image
                     pdf.set_font("Times", "B", 16)
-                    pdf.multi_cell(0, 8, f"DHM {row['Label']}", align="L")
+                    pdf.multi_cell(0, 8, f"DHM {row['Variation']}", align="L")
                     pdf.set_font("Times", "", 14)
                     size_text = f"{row['Size']} cm" if pd.notna(row['Size']) else "Unknown size"
                     pdf.multi_cell(0, 6, size_text, align="L")
 
                 except Exception as e:
-                    st.warning(f"Could not add image {row['Label']}: {e}")
+                    st.warning(f"Could not add image {row['Variation']}: {e}")
                     continue
 
         # Output PDF to BytesIO
@@ -98,7 +98,7 @@ if page == "Gallery view":
         pdf_buffer = io.BytesIO(pdf_bytes)
 
         st.download_button(
-            label="Download PDF",
+            Variation="Download PDF",
             data=pdf_buffer,
             file_name="DHM_gallery.pdf",
             mime="application/pdf"
@@ -113,11 +113,11 @@ if page == "Gallery view":
 
     # Filter DHM options based on selected locations
     if location_filter:
-        dhm_options = df[df["Location"].isin(location_filter)]["Label"].unique()
+        dhm_options = df[df["Location"].isin(location_filter)]["Variation"].unique()
     else:
-        dhm_options = df["Label"].unique()
+        dhm_options = df["Variation"].unique()
 
-    # Sidebar filter by 'Label' (mandatory)
+    # Sidebar filter by 'Variation' (mandatory)
     if st.session_state["gallery_filter"]:
         dhm_filter = st.sidebar.multiselect(
             "Select DHM",
@@ -132,7 +132,7 @@ if page == "Gallery view":
         )
 
     if dhm_filter:
-        selection = df[df["Label"].isin(dhm_filter)]
+        selection = df[df["Variation"].isin(dhm_filter)]
         if location_filter:
             selection = selection[selection["Location"].isin(location_filter)]
 
@@ -151,7 +151,7 @@ if page == "Gallery view":
                         st.image(image, use_container_width=True)
                     with col2:
                         st.markdown(f"""
-                        ## DHM {row['Label']}
+                        ## DHM {row['Variation']}
                         ### {row['Size'] if pd.notna(row['Size']) else 'Unknown size'} cm
                         {row['Date'] if pd.notna(row['Date']) else 'Unknown date'} 
 
@@ -160,10 +160,10 @@ if page == "Gallery view":
                     st.markdown("---")
                 else:
                     with col1:
-                        st.title(f"No image found for DHM {row['Label']}")
+                        st.title(f"No image found for DHM {row['Variation']}")
                     with col2:
                         st.markdown(f"""
-                        ## DHM {row['Label']}
+                        ## DHM {row['Variation']}
                         ### {row['Size'] if pd.notna(row['Size']) else 'Unknown size'} cm
                         {row['Date'] if pd.notna(row['Date']) else 'Unknown date'} 
 
@@ -229,7 +229,7 @@ elif page == "Table view":
         st.success("Changes saved successfully!")
 
     # --- Download button for selection ---
-    download_cols = ["Label", "Size", "Date"]
+    download_cols = ["Variation", "Size", "Date"]
     if not filtered_df.empty:
         to_download = filtered_df[download_cols]
 
@@ -239,7 +239,7 @@ elif page == "Table view":
         buffer.seek(0)
 
         st.download_button(
-            label="Download the selection",
+            Variation="Download the selection",
             data=buffer,
             file_name="DHM_selection.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -248,7 +248,7 @@ elif page == "Table view":
     # --- Apply filters in Gallery button ---
     if st.button("Apply the filters in the Gallery"):
         # Save the filtered DHMs in session_state
-        st.session_state["gallery_filter"] = filtered_df["Label"].tolist()
+        st.session_state["gallery_filter"] = filtered_df["Variation"].tolist()
         # Switch to Gallery view
         st.rerun()
 
@@ -259,13 +259,13 @@ elif page == "Table view":
     if not filtered_df.empty:
         dhm_to_check = st.selectbox(
             "Select a DHM to check",
-            options=filtered_df["Label"].unique(),
+            options=filtered_df["Variation"].unique(),
             key="dhm_check_select"
         )
 
         if st.button("Check photo"):
-            photo_name = df.loc[df["Label"] == dhm_to_check, "Photo"].values[0]
-            ext = df.loc[df["Label"] == dhm_to_check, "Extension"].values[0]
+            photo_name = df.loc[df["Variation"] == dhm_to_check, "Photo"].values[0]
+            ext = df.loc[df["Variation"] == dhm_to_check, "Extension"].values[0]
 
             if pd.isna(ext):
                 ext = ".jpg"  # fallback
@@ -296,7 +296,7 @@ elif page == "Table view":
     )
 
     # Only show DHMs without an Extension value
-    dhm_no_picture = df[df["Extension"].isna()]["Label"].unique()
+    dhm_no_picture = df[df["Extension"].isna()]["Variation"].unique()
 
 
     dhm_for_image = st.selectbox(
@@ -309,7 +309,7 @@ elif page == "Table view":
     if uploaded_file is not None and dhm_for_image:
         if st.button("Upload image"):
             # Determine original filename from CSV
-            photo_name = df.loc[df["Label"] == dhm_for_image, "Photo"].values[0]
+            photo_name = df.loc[df["Variation"] == dhm_for_image, "Photo"].values[0]
             # Get the file extension from uploaded file
             file_ext = os.path.splitext(uploaded_file.name)[1].lower()
             # Build save path
@@ -320,7 +320,7 @@ elif page == "Table view":
 
             # Update extension in CSV if not HEIC
             if file_ext != ".heic":
-                df.loc[df["Label"] == dhm_for_image, "Extension"] = file_ext
+                df.loc[df["Variation"] == dhm_for_image, "Extension"] = file_ext
                 df.to_csv("DHMLISTING.csv", sep=";", index=False, encoding="latin1")
 
             st.success(f"📷 Image saved for DHM {dhm_for_image} at {save_path}")
