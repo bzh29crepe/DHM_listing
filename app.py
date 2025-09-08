@@ -100,7 +100,7 @@ if page == "Gallery view":
         pdf_buffer = io.BytesIO(pdf_bytes)
 
         st.download_button(
-            Variation="Download PDF",
+            label="Download PDF",
             data=pdf_buffer,
             file_name="DHM_gallery.pdf",
             mime="application/pdf"
@@ -241,7 +241,7 @@ elif page == "Table view":
         buffer.seek(0)
 
         st.download_button(
-            Variation="Download the selection",
+            label="Download the selection",
             data=buffer,
             file_name="DHM_selection.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
