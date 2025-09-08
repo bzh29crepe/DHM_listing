@@ -148,7 +148,7 @@ if page == "Gallery view":
                 col1, col2 = st.columns([2, 1])
                 if image is not None:
                     with col1:
-                        st.image(image, use_column_width=True)
+                        st.image(image, use_container_width=True)
                     with col2:
                         st.markdown(f"""
                         ## DHM {row['Label']}
@@ -250,7 +250,7 @@ elif page == "Table view":
         # Save the filtered DHMs in session_state
         st.session_state["gallery_filter"] = filtered_df["Label"].tolist()
         # Switch to Gallery view
-        st.experimental_rerun()
+        st.rerun()
 
     # --- Manual "Check Photo" with dropdown ---
     st.markdown("---")
@@ -276,7 +276,7 @@ elif page == "Table view":
                 resp = requests.head(url, timeout=5)
                 if resp.status_code == 200:
                     st.success(f"✅ Image exists at {url}")
-                    st.image(url, caption=f"DHM {dhm_to_check}", use_column_width=True)
+                    st.image(url, caption=f"DHM {dhm_to_check}", use_container_width=True)
                 else:
                     st.error(f"❌ No picture found at {url}")
             except Exception as e:
@@ -304,7 +304,7 @@ elif page == "Table view":
             options=dhm_no_picture,
             key="dhm_selectbox"
         )
-    
+
     # Upload button
     if uploaded_file is not None and dhm_for_image:
         if st.button("Upload image"):
