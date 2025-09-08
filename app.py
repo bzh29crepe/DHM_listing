@@ -78,18 +78,18 @@ if page == "Gallery view":
                         pdf_height_mm = max_img_height_mm
                         pdf_width_mm = pdf_height_mm * img_ratio
 
-                    # Image position: left-aligned with top margin
-                    x_pos = 10
+                    # Image position: center horizontally
+                    x_pos = (210 - pdf_width_mm) / 2  # page width is 210 mm
                     y_pos = 20
                     pdf.image(tmp_path, x=x_pos, y=y_pos, w=pdf_width_mm, h=pdf_height_mm)
 
-                    # Add text below the image
-                    pdf.set_xy(x_pos, y_pos + pdf_height_mm + 5)  # 5 mm below image
+                    # Add centered text below the image
+                    pdf.set_xy(0, y_pos + pdf_height_mm + 5)  # top margin + image height + 5 mm
                     pdf.set_font("Times", "B", 16)
-                    pdf.multi_cell(0, 8, f"DHM {row['Variation']}", align="L")
+                    pdf.multi_cell(210, 8, f"Variation {row['Variation']}, {row['Date']}", align="C")
                     pdf.set_font("Times", "", 14)
                     size_text = f"{row['Size']} cm" if pd.notna(row['Size']) else "Unknown size"
-                    pdf.multi_cell(0, 6, size_text, align="L")
+                    pdf.multi_cell(210, 6, size_text, align="C")
 
                 except Exception as e:
                     st.warning(f"Could not add image {row['Variation']}: {e}")
@@ -153,7 +153,7 @@ if page == "Gallery view":
                         st.image(image, use_container_width=True)
                     with col2:
                         st.markdown(f"""
-                        ## DHM {row['Variation']}
+                        ## Variation {row['Variation']}
                         ### {row['Size'] if pd.notna(row['Size']) else 'Unknown size'} cm
                         {row['Date'] if pd.notna(row['Date']) else 'Unknown date'} 
 
